@@ -33,6 +33,7 @@
 #include "ns3/ipv4-static-routing-helper.h"
 #include "ns3/ipv4-list-routing-helper.h"
 #include "ns3/energy-module.h"
+#include "ns3/buildings-module.h"
 
 #include "ns3/ocb-wifi-mac.h"
 #include "ns3/wifi-80211p-helper.h"
@@ -85,7 +86,34 @@ GenerateTraffic (Ptr<Socket> socket, uint32_t pktSize,
 class VanetSims
 {
 public:
-    VanetSims ();    
+    VanetSims ();  
+    /** 
+     * Creates a new building with the given params
+     * 
+     * \param x_min attribute
+     * \param x_max attribute
+     * \param y_min
+     * \param y_max  
+     * \param z_min
+     * \param z_max
+     * \param NFloors
+     * \param NRoomsX
+     * \param NRoomsY
+     * \param Btype
+     * \param WallsType
+    */
+    void CreateBuilding(double x_min, double x_max, double y_min,
+        double y_max, double z_min = 0.0, double z_max = 10.0, int NFloors,
+        int NRoomsX, int NRoomsY, Building::BuildingType_t Btype = Building::Residential,
+        Building::ExtWallsType_t WallsType = Building::ConcreteWithWindows);
+    /** 
+     * Creates a grid of buildings with the given params
+     *  
+    */
+    void CreateBuildingsGrid (uint GridWidth, double LengthX, double LengthY,
+        double DeltaX, double DeltaY, double Height, uint NRoomsX, uint NRoomsY, double NFloors,
+        double MinX = 0.0, double MinY = 0.0);
+    
     void CreateNodes ();
     void CreateBuilding();
     void SetPosition (Ptr<Node> node, Vector position);
@@ -205,6 +233,42 @@ VanetSims::Configure (int argc, char **argv)
     cmd.AddValue ("application", "application used", application);
     cmd.AddValue ("mobFile", "mobility file", mobFile);
     cmd.Parse (argc, argv);
+}
+
+void 
+VanetSims::CreateBuilding (double x_min, double x_max, double y_min,
+        double y_max, double z_min = 0.0, double z_max = 10.0, int NFloors,
+        int NRoomsX, int NRoomsY, Building::BuildingType_t Btype = Building::Residential,
+        Building::ExtWallsType_t WallsType = Building::ConcreteWithWindows)
+{
+    Ptr<Building> b = CreateObject <Building> ();
+    b->SetBoundaries (Box (x_min, x_max, y_min, y_max, z_min, z_max));
+    b->SetBuildingType (Btype);
+    b->SetExtWallsType (WallsType);
+    b->SetNFloors (NFloors);
+    b->SetNRoomsX (NRoomsX);
+    b->SetNRoomsY (NRoomsY);
+}
+
+void 
+VanetSims::CreateBuildingsGrid (uint GridWidth, double LengthX, double LengthY,
+        double DeltaX, double DeltaY, double Height, uint NRoomsX, uint NRoomsY, double NFloors,
+        double MinX = 0.0, double MinY = 0.0)
+{
+    Ptr<GridBuildingAllocator>  gridBuildingAllocator;
+    gridBuildingAllocator = CreateObject<GridBuildingAllocator> ();
+    gridBuildingAllocator->SetAttribute ("GridWidth", UintegerValue (GridWidth));
+    gridBuildingAllocator->SetAttribute ("LengthX", DoubleValue (LengthX));
+    gridBuildingAllocator->SetAttribute ("LengthY", DoubleValue (LengthY));
+    gridBuildingAllocator->SetAttribute ("DeltaX", DoubleValue (DeltaX));
+    gridBuildingAllocator->SetAttribute ("DeltaY", DoubleValue (DeltaY));
+    gridBuildingAllocator->SetAttribute ("Height", DoubleValue (Height));
+    gridBuildingAllocator->SetBuildingAttribute ("NRoomsX", UintegerValue (NRoomsX));
+    gridBuildingAllocator->SetBuildingAttribute ("NRoomsY", UintegerValue (NRoomsY));
+    gridBuildingAllocator->SetBuildingAttribute ("NFloors", UintegerValue (NFloors));
+    gridBuildingAllocator->SetAttribute ("MinX", DoubleValue (MinX));
+    gridBuildingAllocator->SetAttribute ("MinY", DoubleValue (MinY));
+    gridBuildingAllocator->Create (6);
 }
 
 void
