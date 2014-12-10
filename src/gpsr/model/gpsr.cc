@@ -528,9 +528,9 @@ RoutingProtocol::RecvGPSR (Ptr<Socket> socket)
   SnrTag tag;
   if (packet->PeekPacketTag(tag))
   {
-//      std::cout << "\nNode: " << receiver
-//              << "\nReceived Packet with SRN = " << tag.Get() 
-//              << "\nfrom " << sender;
+      std::cout << "\nNode: " << receiver
+              << "\nReceived Packet with SRN = " << tag.Get() 
+              << "\nfrom " << sender;
 //      NS_LOG_DEBUG ("Received Packet with SRN = " << tag.Get());
       hello_snr = tag.Get();
   }

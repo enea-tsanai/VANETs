@@ -173,7 +173,7 @@ public:
     /*Countainers*/
     NodeContainer STANodes;
     NodeContainer BSNodes;
-    
+     
     NetDeviceContainer STAdevices;
     NetDeviceContainer BSdevices;
     
@@ -293,7 +293,8 @@ VanetSims::CreateBuildings()
     BuildingsHelper::Install (STANodes);
     BuildingsHelper::Install (BSNodes);
     BuildingsHelper::MakeMobilityModelConsistent ();
-
+    
+//    BuildingList::GetNBuildings();    
 }
 void
 VanetSims::CreateNodes()
